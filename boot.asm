@@ -3,10 +3,17 @@
 
 ORG 0
 BITS 16
+_start:
+    jmp short start ;jump to the 'start' label to skip the padding bytes
+    nop
 
-jmp 0x7c0: start ; this will make code egment start at 0x7c0
+ times 33 db 0 ; reserve 33 bytes for potential BIOS Parameter Block space
+
 
 start:
+    jmp 0x7c0: step2 ; this will make code egment start at 0x7c0
+
+step2:
     cli ; clear interrupts
     mov ax, 0x7c0
     mov ds, ax
@@ -35,7 +42,7 @@ print:
     
 print_char:
   mov ah, 0eh
-  int 0x10 ;display character on the screen
+  int 0x10 ; BIOS interrupt to display character in AL
   ret
 
 message: db 'Hello World!', 0
