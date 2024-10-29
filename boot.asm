@@ -1,6 +1,4 @@
-; Bootloader that initializes segment registers, sets up stack, and prints "Hello World!" with interrupt control
-
-
+; created own interrupt
 ORG 0
 BITS 16
 _start:
@@ -13,6 +11,20 @@ _start:
 start:
     jmp 0x7c0: step2 ; this will make code egment start at 0x7c0
 
+handle_zero:
+    mov ah, 0eh
+    mov al, 'A'
+    mov bx, 0x00
+    int 0x10
+    iret ;interrupt finished
+
+handle_one:
+     mov ah, 0eh
+     mov al, 'V'
+     mov bx, 0x00
+     int 0x10
+     iret
+
 step2:
     cli ; clear interrupts
     mov ax, 0x7c0
@@ -22,6 +34,17 @@ step2:
     mov ss, ax
     mov sp, 0x7c00
     sti ; enables interrupts
+
+    mov word[ss:0x00], handle_zero
+    mov word[ss:0x02], 0x7c0
+    
+    ;mov ax, 0x00
+    ;div ax
+
+    mov word[ss:0x04], handle_one
+    mov word[ss:0x06], 0x7c0
+
+    int 1
 
     mov si, message
     call print
